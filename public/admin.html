@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HorizonSky | Leads Dashboard (Demo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<style>
+    :root {
+        --primary-blue: #0A3D91;
+        --accent-blue: #007BFF;
+        --light-blue: #E6F2FF;
+        --white: #ffffff;
+        --dark-text: #333333;
+        --gray-text: #666666;
+        --bg-gray: #f8f9fa;
+        --success-green: #1E8E3E;
+        --success-bg: #E9F9EE;
+        --warning-amber: #B8860B;
+        --warning-bg: #FFF6E0;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+    body { background: var(--bg-gray); color: var(--dark-text); padding: 30px 4%; }
+    header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:14px; }
+    h1 { color: var(--primary-blue); font-size: 22px; display:flex; align-items:center; gap:10px; }
+    .key-form { display:flex; gap:8px; }
+    .key-form input { padding:10px 14px; border:1px solid #ddd; border-radius:8px; font-size:14px; width: 220px; }
+    .key-form button { padding:10px 18px; border:none; background:var(--primary-blue); color:#fff; border-radius:8px; font-weight:600; cursor:pointer; }
+    .key-form button:hover { background: var(--accent-blue); }
+    .stats { display:flex; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+    .stat-card { background:#fff; border-radius:12px; padding:16px 20px; box-shadow:0 4px 16px rgba(10,61,145,0.06); min-width:150px; }
+    .stat-card .num { font-size:26px; font-weight:700; color:var(--primary-blue); }
+    .stat-card .label { font-size:12.5px; color:var(--gray-text); margin-top:2px; }
+    table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(10,61,145,0.06); }
+    th, td { text-align:left; padding:12px 14px; font-size:13px; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
+    th { background: var(--light-blue); color:var(--primary-blue); font-weight:700; position: sticky; top:0; }
+    tr:hover td { background:#fafcff; }
+    .badge { padding:3px 10px; border-radius:50px; font-size:11.5px; font-weight:700; }
+    .badge.valid { background:var(--success-bg); color:var(--success-green); }
+    .badge.invalid { background:var(--warning-bg); color:var(--warning-amber); }
+    .table-wrap { overflow-x:auto; border-radius:12px; }
+    .empty-state { text-align:center; padding:60px 20px; color:var(--gray-text); }
+    .note { font-size:12.5px; color:var(--gray-text); margin-top:16px; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1><i class="fa-solid fa-database"></i> HorizonSky — Leads Dashboard</h1>
+    <form class="key-form" id="keyForm">
+        <input type="password" id="adminKey" placeholder="Admin key" value="horizonsky-admin">
+        <button type="submit">Load</button>
+    </form>
+</header>
+
+<div class="stats" id="statsRow"></div>
+<div class="table-wrap">
+    <table id="leadsTable" style="display:none;">
+        <thead>
+            <tr>
+                <th>#</th><th>Created</th><th>Name</th><th>Email</th><th>Phone</th>
+                <th>From</th><th>To</th><th>Depart</th><th>Passengers</th><th>Hotel</th>
+                <th>Quoted</th><th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="leadsBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState">Enter the admin key and click Load to view stored leads.</div>
+</div>
+<p class="note">This is an unauthenticated demo dashboard for local testing only — add real auth before deploying publicly.</p>
+
+<script>
+document.getElementById('keyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const key = document.getElementById('adminKey').value;
+    const emptyState = document.getElementById('emptyState');
+    const table = document.getElementById('leadsTable');
+    const body = document.getElementById('leadsBody');
+    const statsRow = document.getElementById('statsRow');
+
+    emptyState.textContent = 'Loading...';
+    emptyState.style.display = 'block';
+    table.style.display = 'none';
+
+    try {
+        const res = await fetch('/api/leads', { headers: { 'x-admin-key': key } });
+        if (!res.ok) {
+            emptyState.textContent = res.status === 401 ? 'Invalid admin key.' : 'Failed to load leads.';
+            return;
+        }
+        const data = await res.json();
+        statsRow.innerHTML = `
+            <div class="stat-card"><div class="num">${data.stats.totalLeads}</div><div class="label">Total Leads</div></div>
+            <div class="stat-card"><div class="num">${data.stats.invalidLeads}</div><div class="label">Flagged Contact Info</div></div>
+            <div class="stat-card"><div class="num">${data.stats.totalSearches}</div><div class="label">Flight Searches</div></div>
+        `;
+
+        if (!data.leads.length) {
+            emptyState.textContent = 'No leads stored yet — submit the quote form on the site to create one.';
+            emptyState.style.display = 'block';
+            table.style.display = 'none';
+            return;
+        }
+
+        body.innerHTML = data.leads.map((l) => `
+            <tr>
+                <td>${l.id}</td>
+                <td>${l.created_at}</td>
+                <td>${l.name || '—'}</td>
+                <td>${l.email || '—'}</td>
+                <td>${(l.country_code || '')} ${l.phone || '—'}</td>
+                <td>${l.from_city || '—'}</td>
+                <td>${l.to_city || '—'}</td>
+                <td>${l.depart_date || '—'}</td>
+                <td>${l.passengers || '—'}</td>
+                <td>${l.hotel_needed ? 'Yes' : 'No'}</td>
+                <td>${l.quoted_price || '—'}</td>
+                <td>${l.is_valid
+                    ? '<span class="badge valid">Valid</span>'
+                    : `<span class="badge invalid" title="${l.invalid_reason || ''}">Flagged: ${l.invalid_field || ''}</span>`}</td>
+            </tr>
+        `).join('');
+
+        emptyState.style.display = 'none';
+        table.style.display = 'table';
+    } catch (err) {
+        emptyState.textContent = 'Could not reach the server.';
+        emptyState.style.display = 'block';
+    }
+});
+</script>
+</body>
+</html>

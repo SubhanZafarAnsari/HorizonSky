@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HorizonSky | Book Cheap Flights &amp; Get a Free Quote</title>
+<meta name="description" content="Search flights and get a free, personalized quote from a HorizonSky travel agent — best price guaranteed.">
+
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- =========================================================
+     NAVBAR
+     ========================================================= -->
+<nav class="navbar">
+    <a href="index.html" class="brand">
+        <img src="assets/logo-icon.png" alt="HorizonSky logo">
+        <span class="brand-word">HORIZON<span>SKY</span></span>
+    </a>
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="flights.html">Flights</a></li>
+        <li><a href="hotels.html">Hotels</a></li>
+        <li><a href="deals.html">Deals</a></li>
+        <li><a href="about.html">About Us</a></li>
+    </ul>
+    <a href="tel:+442046176370" class="contact-btn">
+        <i class="fa-solid fa-headset"></i> Call 24/7
+    </a>
+    <button class="nav-toggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+</nav>
+
+<!-- =========================================================
+     PHASE 1 — HERO + SEARCH
+     ========================================================= -->
+<header class="hero" id="heroSection">
+    <span class="hero-eyebrow"><i class="fa-solid fa-shield-halved"></i> Best offline price guarantee</span>
+    <h1>Discover the World With HorizonSky</h1>
+    <p>Search flights to top destinations worldwide and get a free personalized quote in minutes.</p>
+
+    <section class="search-container">
+        <div class="search-tabs">
+            <button type="button" class="tab active" data-tab="flights"><i class="fa-solid fa-plane"></i> Flights</button>
+            <button type="button" class="tab" data-tab="hotels"><i class="fa-solid fa-bed"></i> Hotels</button>
+        </div>
+
+        <form class="search-form" id="flightSearchForm" novalidate>
+            <div class="input-group">
+                <label for="departure">Leaving From</label>
+                <i class="fa-solid fa-location-dot field-icon"></i>
+                <input type="text" id="departure" placeholder="City or Airport" autocomplete="off" required>
+            </div>
+
+            <div class="input-group">
+                <label for="destination">Going To</label>
+                <i class="fa-solid fa-location-dot field-icon"></i>
+                <input type="text" id="destination" placeholder="City or Airport" autocomplete="off" required>
+            </div>
+
+            <div class="input-group">
+                <label for="departDate">Depart</label>
+                <i class="fa-regular fa-calendar field-icon"></i>
+                <input type="date" id="departDate" required>
+            </div>
+
+            <div class="input-group">
+                <label for="returnDate">Return</label>
+                <i class="fa-regular fa-calendar field-icon"></i>
+                <input type="date" id="returnDate">
+            </div>
+
+            <div class="input-group">
+                <label for="passengers">Passengers</label>
+                <i class="fa-solid fa-users field-icon"></i>
+                <select id="passengers">
+                    <option value="1_adult_economy">1 Adult, Economy</option>
+                    <option value="2_adults_economy" selected>2 Adults, Economy</option>
+                    <option value="1_adult_business">1 Adult, Business</option>
+                </select>
+            </div>
+
+            <button type="submit" id="searchBtn" class="search-submit">
+                <i class="fa-solid fa-magnifying-glass"></i> Search Flights
+            </button>
+        </form>
+    </section>
+</header>
+
+<!-- =========================================================
+     PHASE 2 / 3 — QUOTE FLOW (hidden until a search runs)
+     ========================================================= -->
+<section class="quote-section" id="quoteSection" style="display:none;">
+
+    <!-- LEFT: swaps between loading / results / thank-you -->
+    <div class="quote-left" id="quoteLeft"></div>
+
+    <!-- RIGHT: persistent lead-capture panel -->
+    <aside class="quote-right">
+        <div class="call-banner">
+            <img class="agent-photo" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200&auto=format&fit=crop" alt="Travel agent">
+            <div class="call-text">
+                <a href="tel:+442046176370">Call +44 20 4617 6370</a>
+                <p>Get EXTRA $30 OFF with code <span class="promo-code">SKY30</span></p>
+            </div>
+        </div>
+
+        <div class="divider-or">OR</div>
+        <p class="quote-form-title">Get the Best Quote Guaranteed</p>
+
+        <form class="lead-form" id="leadForm" novalidate>
+            <div class="swap-fields">
+                <div class="input-group">
+                    <label for="leadFrom">From*</label>
+                    <i class="fa-solid fa-plane-departure field-icon"></i>
+                    <input type="text" id="leadFrom" placeholder="From" required>
+                </div>
+                <button type="button" class="swap-btn" id="swapCitiesBtn" aria-label="Swap cities" title="Swap cities">
+                    <i class="fa-solid fa-arrows-turn-to-dots"></i>
+                </button>
+                <div class="input-group">
+                    <label for="leadTo">To*</label>
+                    <i class="fa-solid fa-plane-arrival field-icon"></i>
+                    <input type="text" id="leadTo" placeholder="To" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="leadEmail">Email*</label>
+                <i class="fa-regular fa-envelope field-icon"></i>
+                <input type="email" id="leadEmail" placeholder="Email" required>
+            </div>
+            <div class="field-error-msg" id="emailError" style="display:none;"></div>
+
+            <div class="input-group">
+                <label for="leadPhone">Phone Number*</label>
+                <div class="phone-field-row">
+                    <select class="country-select" id="countryCode">
+                        <option value="+44" selected>🇬🇧 +44</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+92">🇵🇰 +92</option>
+                        <option value="+61">🇦🇺 +61</option>
+                        <option value="+971">🇦🇪 +971</option>
+                    </select>
+                    <input type="tel" id="leadPhone" placeholder="Phone Number" required style="padding-left:14px;">
+                </div>
+            </div>
+            <div class="field-error-msg" id="phoneError" style="display:none;"></div>
+
+            <div class="input-group">
+                <label for="leadName">Your Name (Optional)</label>
+                <i class="fa-regular fa-user field-icon"></i>
+                <input type="text" id="leadName" placeholder="Your Name (Optional)">
+            </div>
+
+            <label class="checkbox-row">
+                <input type="checkbox" id="hotelNeeded">
+                Hotel is needed
+            </label>
+
+            <button type="submit" class="quote-submit-btn" id="leadSubmitBtn">GET A FREE QUOTE</button>
+
+            <p class="legal-fine-print">
+                By providing my contact details and clicking on "GET A FREE QUOTE" I agree to be contacted for
+                travel information via phone, text messages and email. No purchase necessary. We respect your
+                <a href="privacy.html">privacy</a>.
+            </p>
+        </form>
+    </aside>
+</section>
+
+<!-- =========================================================
+     TRUST / FEATURES BAR
+     ========================================================= -->
+<section class="features-bar">
+    <div class="feature">
+        <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="feature-text">
+            <h4>Travel Protected</h4>
+            <p>Book with 100% confidence</p>
+        </div>
+    </div>
+    <div class="feature">
+        <div class="feature-icon"><i class="fa-solid fa-tags"></i></div>
+        <div class="feature-text">
+            <h4>Best Price Guarantee</h4>
+            <p>We match the lowest prices</p>
+        </div>
+    </div>
+    <div class="feature">
+        <div class="feature-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div class="feature-text">
+            <h4>Flexible Payments</h4>
+            <p>Deposit now, pay later</p>
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================
+     TOAST — "unable to connect" fallback
+     ========================================================= -->
+<div class="toast" id="connectToast" role="status" aria-live="polite">
+    <div class="toast-header">
+        <i class="fa-solid fa-phone-slash toast-icon"></i>
+        <p id="toastMessage"></p>
+        <button class="toast-close" id="toastCloseBtn" aria-label="Dismiss"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="toast-actions">
+        <a href="tel:+442046176370" class="toast-agent-btn" id="connectAgentBtn">
+            <i class="fa-solid fa-headset"></i> Connect with Agent
+        </a>
+    </div>
+</div>
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+<footer class="site-footer">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <a href="index.html" class="brand">
+                <img src="assets/logo-icon.png" alt="HorizonSky logo">
+                <span class="brand-word">HORIZON<span>SKY</span></span>
+            </a>
+            <p>HorizonSky helps you find and book the best flight deals worldwide, backed by real travel agents whenever you need one.</p>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h5>Company</h5>
+            <ul>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="careers.html">Careers</a></li>
+                <li><a href="press.html">Press</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h5>Support</h5>
+            <ul>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="faqs.html">FAQs</a></li>
+                <li><a href="manage-booking.html">Manage Booking</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h5>Legal</h5>
+            <ul>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+                <li><a href="cookie-preferences.html">Cookie Preferences</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© <span id="footerYear"></span> HorizonSky. All rights reserved.</span>
+        <span><a href="privacy.html">Privacy</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="sitemap.html">Sitemap</a></span>
+    </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
