@@ -4,7 +4,6 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
-const { insertLead, insertSearch, getAllLeads, getLeadById, getStats } = require('./db');
 const { isValidEmail, isValidPhone } = require('./validation');
 const { sendLeadNotification } = require('./email');
 
@@ -62,7 +61,7 @@ function airportCode(cityText) {
 }
 
 // ---------------------------------------------------------------------------
-// API: Search — logs the search and returns a mock quote for the route.
+// API: Search — returns a mock quote for the route. (DB logging removed)
 // ---------------------------------------------------------------------------
 app.post('/api/search', (req, res) => {
   const { from, to, departDate, returnDate, passengers } = req.body || {};
@@ -70,14 +69,6 @@ app.post('/api/search', (req, res) => {
   if (!from || !to) {
     return res.status(400).json({ error: 'from and to are required' });
   }
-
-  insertSearch({
-    from_city: from,
-    to_city: to,
-    depart_date: departDate,
-    return_date: returnDate,
-    passengers
-  });
 
   const quote = buildQuote(from, to);
 
@@ -98,7 +89,8 @@ app.post('/api/search', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// API: Leads — validates + stores a quote request from the sticky form.
+// API: Leads — validates + emails a quote request from the sticky form.
+// (DB storage removed — this is now a stateless notify-only endpoint.)
 // ---------------------------------------------------------------------------
 app.post('/api/leads', (req, res) => {
   const {
@@ -128,7 +120,7 @@ app.post('/api/leads', (req, res) => {
 
   const isValid = !invalidField;
 
-  const leadId = insertLead({
+  const lead = {
     from_city: from,
     to_city: to,
     depart_date: departDate,
@@ -144,38 +136,23 @@ app.post('/api/leads', (req, res) => {
     invalid_field: invalidField,
     invalid_reason: isValid ? null : (invalidField === 'phone' ? phoneCheck.reason : emailCheck.reason),
     invalid_value: invalidValue
-  });
+  };
 
-  console.log(`\n New lead #${leadId}: ${name || '(no name)'} | ${email} | ${countryCode || ''}${phone} | valid=${isValid}`);
+  console.log(`\n New lead: ${name || '(no name)'} | ${email} | ${countryCode || ''}${phone} | valid=${isValid}`);
 
   // Fire-and-forget: email the lead to the inbox without delaying the
   // response back to the browser, and without ever failing the request
   // if SMTP isn't configured or delivery fails.
-  const storedLead = getLeadById(leadId);
-  if (storedLead) {
-    sendLeadNotification(storedLead);
-  }
+  sendLeadNotification(lead);
 
   res.json({
     success: true,
-    leadId,
     valid: isValid,
     invalidField,
     invalidValue
   });
 });
 
-// ---------------------------------------------------------------------------
-// API: Admin — read-only view of stored leads, gated by a simple header key.
-// ---------------------------------------------------------------------------
-app.get('/api/leads', (req, res) => {
-  if (req.headers['x-admin-key'] !== ADMIN_KEY) {
-    return res.status(401).json({ error: 'unauthorized' });
-  }
-  res.json({ leads: getAllLeads(), stats: getStats() });
-});
-
 app.listen(PORT, () => {
-  console.log(`\n HorizonSky server running: http://localhost:${PORT}`);
-  console.log(` Admin dashboard:           http://localhost:${PORT}/admin.html  (key: ${ADMIN_KEY})\n`);
+  console.log(`\n HorizonSky server running: http://localhost:${PORT}\n`);
 });

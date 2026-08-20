@@ -421,6 +421,20 @@
             console.error('Lead submission failed:', err);
         }
 
+         // Send email notification via EmailJS (fire-and-forget, doesn't block UI)
+        emailjs.send('service_q993bp2', 'template_xerm2ie', {
+            name: name,
+            email: email,
+            phone: `${countryCode} ${phone}`,
+            from_city: from,
+            to_city: to,
+            depart_date: state.departDate,
+            return_date: state.returnDate,
+            passengers: state.passengers,
+            quoted_price: state.quotedPriceLabel || 'N/A',
+            hotel_needed: hotelNeeded ? 'Yes' : 'No'
+        }).catch((err) => console.error('EmailJS error:', err));
+
         leadSubmitBtn.disabled = false;
         leadSubmitBtn.textContent = 'GET A FREE QUOTE';
 
