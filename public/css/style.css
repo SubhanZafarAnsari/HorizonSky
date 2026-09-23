@@ -1070,4 +1070,11 @@ img { display: block; max-width: 100%; }
     .price-block { flex-direction: column; }
     .footer-grid { grid-template-columns: 1fr; }
     .toast { right: 10px; left: 10px; bottom: 10px; width: auto; max-width: none; }
+
+    /* Force one field per row and stop native date inputs (iOS Safari)
+       from overflowing their flex container */
+    .search-form { flex-direction: column; flex-wrap: nowrap; }
+    .input-group { min-width: 0; width: 100%; }
+    .input-group input,
+    .input-group select { min-width: 0; width: 100%; }
 }
